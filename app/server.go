@@ -35,7 +35,7 @@ func main() {
 		req := string(buf)
 
 		requestLine := strings.Split(req, CRLF)[0]
-		// headers := strings.Split(strings.Split(req, CRLF)[1], CRLF)
+		headers := strings.Split(strings.Split(req, CRLF)[1], CRLF)
 		// body := strings.Split(req, CRLF+CRLF)[1]
 
 		// method := strings.Split(requestLine, " ")[0]
@@ -50,7 +50,10 @@ func main() {
 		} else if pathFragments[1] == "echo" {
 			msg := pathFragments[2]
 			res = []byte(fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", len(msg), msg))
+		} else if pathFragments[1] == "user-agent" {
+
 		}
+
 		conn.Write(res)
 		conn.Close()
 	}
