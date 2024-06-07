@@ -7,6 +7,8 @@ import (
 	"strings"
 )
 
+type header map[string]string
+
 const CRLF = "\r\n"
 
 func main() {
@@ -35,7 +37,7 @@ func main() {
 		req := string(buf)
 
 		requestLine := strings.Split(req, CRLF)[0]
-		headers := strings.Split(strings.Split(req, CRLF)[1], CRLF)
+		headers := parseHeaders(strings.Split(strings.Split(req, CRLF+CRLF)[0], CRLF)[1:])
 		// body := strings.Split(req, CRLF+CRLF)[1]
 
 		// method := strings.Split(requestLine, " ")[0]
@@ -51,10 +53,20 @@ func main() {
 			msg := pathFragments[2]
 			res = []byte(fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", len(msg), msg))
 		} else if pathFragments[1] == "user-agent" {
-
+			msg := headers["User-Agent"]
+			res = []byte(fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", len(msg), msg))
 		}
 
 		conn.Write(res)
 		conn.Close()
 	}
+}
+
+func parseHeaders(s []string) header {
+	headers := make(header)
+	for _, e := range s {
+		header := strings.Split(e, ": ")
+		headers[header[0]] = header[1]
+	}
+	return headers
 }
